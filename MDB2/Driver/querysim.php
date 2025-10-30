@@ -483,8 +483,10 @@ class MDB2_Driver_querysim extends MDB2_Driver_Common
             unset($lineData[count($lineData) - 1]);
         }
         //populate columnNames array
-        $thisLine = each($lineData);
-        $columnNames = $this->_parseOnDelim($thisLine[1], $columnDelim);
+        reset($lineData);
+        $firstKey = key($lineData);
+        $thisLine = current($lineData);
+        $columnNames = $this->_parseOnDelim($thisLine, $columnDelim);
         if ((in_array('', $columnNames)) || (in_array('NULL', $columnNames))) {
             return $this->raiseError(MDB2_ERROR_SYNTAX, null, null,
                 'all column names must be defined', __FUNCTION__);
@@ -495,8 +497,9 @@ class MDB2_Driver_querysim extends MDB2_Driver_Common
         $rowNum = 0;
         //loop through data lines
         if (count($lineData) > 1) {
-            while ($thisLine = each($lineData)) {
-                $thisData = $this->_parseOnDelim($thisLine[1], $dataDelim);
+            next($lineData); // Skip the first line (column names)
+            while (($thisLine = current($lineData)) !== false) {
+                $thisData = $this->_parseOnDelim($thisLine, $dataDelim);
                 $thisDataCount = count($thisData);
                 if ($thisDataCount != $columnCount) {
                     $fileLineNo = $rowNum + 2;
@@ -512,6 +515,7 @@ class MDB2_Driver_querysim extends MDB2_Driver_Common
                     $data[$rowNum][] = str_replace('[$double-slash$]', '\\', $thisElement);
                 }//end foreach
                 ++$rowNum;
+                next($lineData); // Move to next line
             }//end while
         }//end if
         return array($columnNames, $data);
