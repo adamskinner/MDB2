@@ -95,6 +95,12 @@ class MDB2_Driver_mysql extends MDB2_Driver_Common
         $this->phptype = 'mysql';
         $this->dbsyntax = 'mysql';
 
+        // Check for mysql extension availability (removed in PHP 7.0)
+        if (!function_exists('mysql_connect')) {
+            $this->warnings[] = 'The mysql extension is not available. ' .
+                'It was removed in PHP 7.0. Please use the mysqli driver instead.';
+        }
+
         $this->supported['sequences'] = 'emulated';
         $this->supported['indexes'] = true;
         $this->supported['affected_rows'] = true;

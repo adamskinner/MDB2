@@ -433,7 +433,7 @@ class MDB2_PEARProxy extends PEAR
     function quoteString($string)
     {
         $string = $this->quote($string);
-        if ($string{0} == "'") {
+        if ($string[0] == "'") {
             return substr($string, 1, -1);
         }
         return $string;
